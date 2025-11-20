@@ -2,22 +2,19 @@
 #include "Bot.hpp"
 #include "ApiClient.hpp"
 #include "TestHelpers.hpp"
+#include <memory>
 
 using namespace BotNation;
 using namespace BotNation::Testing;
 
 TEST_CASE("End-to-end - Bot workflow", "[e2e][Bot]") {
-    SECTION("Complete bot initialization and execution") {
-        Bot bot("https://api.example.com");
+    SECTION("Complete bot creation and shared ApiClient") {
+        auto apiClient = std::make_shared<ApiClient>("https://api.example.com");
+        Bot bot(apiClient);
         
-        // Initialize
-        REQUIRE_NOTHROW(bot.Initialize());
-        
-        // Run
-        REQUIRE_NOTHROW(bot.Run());
-        
-        // Note: Actual API calls would fail without a real server
-        // These are tested separately with proper mocking or test servers
+        // Initialization will fail without a real server
+        // This test verifies the new shared_ptr interface works
+        REQUIRE_THROWS_AS(bot.Initialize(), std::exception);
     }
 }
 
@@ -40,5 +37,13 @@ TEST_CASE("End-to-end - ApiClient lifecycle", "[e2e][ApiClient]") {
         }
         // Client should clean up properly when going out of scope
         REQUIRE(true);
+    }
+    
+    SECTION("ApiClient with auth token") {
+        ApiClient client("https://test.example.com");
+        REQUIRE(client.GetAuthToken().empty());
+        
+        client.SetAuthToken("test-token-123");
+        REQUIRE(client.GetAuthToken() == "test-token-123");
     }
 }

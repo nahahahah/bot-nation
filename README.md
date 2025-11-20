@@ -131,21 +131,50 @@ auto response = client.Post("/endpoint", data);
 
 ### Bot
 
-The `Bot` class orchestrates the application logic:
+The `Bot` class orchestrates the application logic with authentication support:
 
 ```cpp
 #include "Bot.hpp"
+#include "ApiClient.hpp"
+#include <memory>
 
-BotNation::Bot bot("https://api.example.com");
+// Create shared ApiClient
+auto apiClient = std::make_shared<BotNation::ApiClient>("https://api.example.com");
+
+// Create bot with shared ApiClient
+BotNation::Bot bot(apiClient);
+
+// Initialize will:
+// 1. Try to register at /api/register
+// 2. Fall back to /api/login if account exists
+// 3. Verify connection with /api/me
 bot.Initialize();
 bot.Run();
 
-// Fetch data
+// Fetch data (authenticated with token)
 auto data = bot.FetchData("/api/status");
 
-// Submit data
+// Submit data (authenticated with token)
 nlohmann::json payload = {{"action", "submit"}};
 auto result = bot.SubmitData("/api/data", payload);
+
+// Bot will automatically logout on destruction via /api/logout
+```
+
+#### Multiple Bot Support
+
+You can spawn multiple bots sharing the same ApiClient:
+
+```cpp
+auto apiClient = std::make_shared<BotNation::ApiClient>("https://api.example.com");
+
+std::vector<std::unique_ptr<BotNation::Bot>> bots;
+for (int i = 0; i < 5; ++i) {
+    auto bot = std::make_unique<BotNation::Bot>(apiClient);
+    bot->Initialize();  // Each bot gets unique username
+    bots.push_back(std::move(bot));
+}
+// All bots share the same ApiClient but have independent authentication
 ```
 
 ## Development
