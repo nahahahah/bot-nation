@@ -27,6 +27,14 @@ std::string ApiClient::GetBaseUrl() const {
     return _baseUrl;
 }
 
+void ApiClient::SetAuthToken(const std::string& token) {
+    _authToken = token;
+}
+
+std::string ApiClient::GetAuthToken() const {
+    return _authToken;
+}
+
 std::string ApiClient::MakeRequest(const std::string& method, const std::string& endpoint, const std::string& body) {
     CURL* curl = curl_easy_init();
     if (!curl) {
@@ -42,11 +50,19 @@ std::string ApiClient::MakeRequest(const std::string& method, const std::string&
     
     struct curl_slist* headers = nullptr;
     
+    // Add auth token if available
+    if (!_authToken.empty()) {
+        std::string authHeader = "X-Api-Token: " + _authToken;
+        headers = curl_slist_append(headers, authHeader.c_str());
+    }
+    
     if (method == "POST") {
         curl_easy_setopt(curl, CURLOPT_POST, 1L);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.c_str());
         
         headers = curl_slist_append(headers, "Content-Type: application/json");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    } else if (headers) {
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     }
     

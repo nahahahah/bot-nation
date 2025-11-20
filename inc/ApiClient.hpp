@@ -17,9 +17,13 @@ public:
     
     void SetBaseUrl(const std::string& url);
     std::string GetBaseUrl() const;
+    
+    void SetAuthToken(const std::string& token);
+    std::string GetAuthToken() const;
 
 private:
     std::string _baseUrl;
+    std::string _authToken;
     
     std::string MakeRequest(const std::string& method, const std::string& endpoint, const std::string& body = "");
 };

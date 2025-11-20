@@ -1,6 +1,8 @@
 #include "Bot.hpp"
+#include "ApiClient.hpp"
 #include <iostream>
 #include <string>
+#include <memory>
 
 int main(int argc, char* argv[]) {
     try {
@@ -14,7 +16,10 @@ int main(int argc, char* argv[]) {
         std::cout << "Bot Nation - C++20 API Client" << std::endl;
         std::cout << "==============================" << std::endl;
         
-        BotNation::Bot bot(apiUrl);
+        // Create shared ApiClient that can be shared among multiple bots
+        auto apiClient = std::make_shared<BotNation::ApiClient>(apiUrl);
+        
+        BotNation::Bot bot(apiClient);
         bot.Initialize();
         bot.Run();
         

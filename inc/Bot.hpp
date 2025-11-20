@@ -9,7 +9,7 @@ namespace BotNation {
 
 class Bot {
 public:
-    Bot(const std::string& apiBaseUrl);
+    Bot(std::shared_ptr<ApiClient> apiClient);
     ~Bot();
     
     void Initialize();
@@ -18,8 +18,9 @@ public:
     nlohmann::json SubmitData(const std::string& endpoint, const nlohmann::json& data);
 
 private:
-    std::unique_ptr<ApiClient> _apiClient;
+    std::shared_ptr<ApiClient> _apiClient;
     bool _initialized;
+    std::string _username;
     
     void ValidateInitialization() const;
 };
