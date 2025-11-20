@@ -1,0 +1,28 @@
+# Xmake build artifacts
+build/
+.xmake/
+
+# Compiled binaries
+*.o
+*.a
+*.so
+*.dll
+*.exe
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+
+# CodeQL
+_codeql_detected_source_root
